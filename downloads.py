@@ -88,7 +88,7 @@ def download_from_google_cloud_storage(raw_url,
         #r = requests.get(target_url, allow_redirects=True)
         #with open(local_file_path, 'bw') as fp:
         #    fp.write(r.content)
-        wget.download(target_url, 'local_file_path')
+        wget.download(target_url, local_file_path)
 
 if __name__ == '__main__':
     events_df = parse_information_operations_html()
