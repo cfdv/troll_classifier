@@ -77,13 +77,22 @@ def load_authors(filename):
 
 if __name__ == '__main__':
 
-    # Define the dataset
-    dataset = load_authors('data/unique_author_fullname')[4065:]
+    table = conn_mongo()
+    reddit = conn_reddit(load_credentials(CREDS_FILE))
+
+    dataset = load_authors('data/unique_author_fullname')[4675:]
+    for a in dataset:
+        raw_d = get_author(reddit, a)
+        if raw_d:
+            d = clean_author(raw_d)
+            save_to_mongo(table, d)
+        else:
+            print(f'did not receive redditor object for author {a}') 
 
     # Run this with a pool of 5 agents having a chunksize of 3 until finished
-    agents = 30
-    chunksize = 100
-    p = Pool(agents)
-    p.map(job, dataset, chunksize=chunksize)
-    p.close()
-    p.join()
+#    agents = 1
+#    chunksize = 100
+#    p = Pool(agents)
+#    p.map(job, dataset, chunksize=chunksize)
+#    p.close()
+#    p.join()
