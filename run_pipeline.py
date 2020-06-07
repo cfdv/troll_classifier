@@ -114,10 +114,6 @@ def plot_confusion_matrix(cm, # confusion matrix
     plt.ylabel('Predicted label')
     plt.xlabel('True label')
 
-
-# In[31]:
-
-
 def plot_roc_nofit(ax, X_test, y_test, clf, clf_name, **kwargs):
     y_prob = np.zeros((len(y_test),2))
     mean_tpr = 0.0
@@ -194,7 +190,8 @@ def train_brf_cv(corpus, comms):
                    'random_state': random_state,
                    'class_weight': 'balanced_subsample'
                   }
-    comms_meta = ['controversiality', 'score', 'norm_depth']
+    # comms_meta = ['controversiality', 'score', 'norm_depth'] # 1_16_Jun_7
+    comms_meta = ['score', 'norm_depth']
     
     # keep a dictionary of classifiers as we go
     clfs = {}
