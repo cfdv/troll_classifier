@@ -15,12 +15,8 @@ from datetime import datetime as dt
 
 import time
 
-# TODO: move to app config file
-CREDS_FILE = '/opt/cap1/.cap1'
-MONGO_HOST = 'localhost'
-MONGO_PORT = 27017
-MONGO_DB = 'cap2'
-MONGO_COLL = 'author'
+from config import MONGO_AUTHOR
+from app import conn_reddit, conn_mongo
 
 def save_to_mongo(table, d):
     for key in ['_reddit']:
@@ -51,33 +47,13 @@ def job(author_fullname):
     d = clean_author(raw_d)
     save_to_mongo(table, d)
 
-def load_credentials(filename):
-    with open(filename, 'r') as fp:
-        creds = {}
-        for line in fp:
-            k, v = line.replace('\n','').split('\t')
-            creds[k] = v
-        return creds
-
-def conn_mongo():
-    client = MongoClient(MONGO_HOST, MONGO_PORT)
-    db = client[MONGO_DB]
-    return db[MONGO_COLL]
-
-def conn_reddit(creds):
-    return praw.Reddit(client_id=creds['REDDIT_ID'],
-        client_secret=creds['REDDIT_SECRET'],
-        password=creds['REDDIT_PASSWORD'],
-        username=creds['REDDIT_USERNAME'],
-        user_agent='accessAPI:v0.0.1 (by /u/{})'.format(creds['REDDIT_USERNAME']))
-
 def load_authors(filename):
     with open(filename, 'r') as fp:
         return fp.read().split('\n')
 
 if __name__ == '__main__':
 
-    table = conn_mongo()
+    table = conn_mongo(coll=MONGO_AUTHOR)
     reddit = conn_reddit(load_credentials(CREDS_FILE))
 
     dataset = load_authors('data/unique_author_fullname')[4675:]
