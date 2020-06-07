@@ -23,7 +23,8 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 # from sklearn.metrics import roc_auc_score
 # from sklearn.metrics import plot_confusion_matrix
-# from sklearn.inspection import permutation_importance, plot_partial_dependence
+from sklearn.inspection import permutation_importance
+# from sklearn.inspection import plot_partial_dependence
 
 from imblearn.ensemble import BalancedRandomForestClassifier
 
@@ -155,6 +156,24 @@ def evaluate_model(brf, label, X_test, y_test):
     plot_roc_nofit(ax, X_test, y_test, brf, label)
     plt.savefig(f'img/{label}_roc.png')
 
+def inspect_model(comms_meta, tfidf_vectorizer, brf, X_test, y_test):
+    n_top_features_tfidf = 10
+    comms_features = (
+        comms_meta 
+            + 
+        ['num_replies', 'num_pred_child_of_troll']
+    )
+    X_features = (tfidf_vectorizer.get_feature_names() + comms_features)
+    subsample_test_index = np.random.choice(range(len(X_test)), size=10000, replace=False)
+    n_top_features = n_top_features_tfidf + len(comms_features)
+    result = permutation_importance(brf, X_test[subsample_test_index], 
+                                y_test.iloc[subsample_test_index], n_repeats=10,
+                                random_state=42, n_jobs=-3)
+    filename = 'data/saved_models/no_controversiality_perm_importance_troll_with_replies_brf.pkl'
+    with open(filename, 'wb') as fp:
+        pickle.dump(result, fp)
+    
+
 def train_brf_cv(corpus, comms):
     '''
     k-folds cross-validation for model
@@ -193,6 +212,8 @@ def train_brf_cv(corpus, comms):
     # comms_meta = ['controversiality', 'score', 'norm_depth'] # 1_16_Jun_7
     comms_meta = ['score', 'norm_depth']
     
+    print('[run_pipeline.py] metadata columns: {}'.format(' '.join(comms_meta)))
+    
     # keep a dictionary of classifiers as we go
     clfs = {}
     # train/test split
@@ -218,7 +239,7 @@ def train_brf_cv(corpus, comms):
     brf.fit(X_train, y_train)
     clfs[clf_label] = brf
     evaluate_model(brf, clf_label, X_test, y_test)
-    
+    inspect_model(comms_meta, tfidf_vectorizer, brf, X_test, y_test)
     #################### STAGE 2, train to classify `troll?`
     # next engineer the `child_suggests_troll?` and `num_replies` features
     
@@ -299,7 +320,7 @@ def train_brf_cv(corpus, comms):
     # evaluate model
     clfs[clf_label] = brf
     evaluate_model(brf, clf_label, X_test_stage2, y_test)
-    
+    # inspect_model(comms_meta, tfidf_vectorizer, brf, X_test_stage2, y_test)
     return clfs
 
 def report_to_user(text):
