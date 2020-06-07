@@ -15,8 +15,7 @@ from datetime import datetime as dt
 
 import time
 
-from config import MONGO_AUTHOR
-from app import conn_reddit, conn_mongo
+from app import conn_reddit, conn_mongo, MONGO_AUTHOR
 
 def save_to_mongo(table, d):
     for key in ['_reddit']:
@@ -54,10 +53,11 @@ def load_authors(filename):
 if __name__ == '__main__':
 
     table = conn_mongo(coll=MONGO_AUTHOR)
-    reddit = conn_reddit(load_credentials(CREDS_FILE))
+    reddit = conn_reddit()
 
-    dataset = load_authors('data/unique_author_fullname')[4675:]
+    dataset = load_authors('data/unique_author_fullname')[85000:]
     for a in dataset:
+        print(f'searching for author: {a}')
         raw_d = get_author(reddit, a)
         if raw_d:
             d = clean_author(raw_d)
