@@ -71,6 +71,6 @@ Future work includes:
 
 * confirm the model works well in conversations without troll activity
 
-One of my favorite parts of this dataset is [a casualiAMA by the trolls themselves](https://www.reddit.com/r/casualiama/comments/7m1hht/we_are_russian_trolls_ask_us_anything/), complete with self-portraits!
+One of my favorite parts of this dataset is [a casualiAMA by the trolls themselves](https://www.reddit.com/r/casualiama/comments/7m1hht/we_are_russian_trolls_ask_us_anything/), complete with [self-portraits](img/russian_troll_horde.png)!
 
 Thank you so much for your interest!
